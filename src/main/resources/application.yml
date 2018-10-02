@@ -1,0 +1,49 @@
+spring:
+    jackson:
+        time-zone: GMT+8
+        date-format: yyyy-MM-dd HH:mm:ss
+    template:
+        prefix: classpath:/templates/
+        suffix: .html
+        cache: false
+        content-type: text/html
+        enabled: true
+        encoding: UTF-8
+        mode: HTML5
+    datasource:
+        url: jdbc:mysql://127.0.0.1:3306/seckill?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+        username: root
+        password: pingjin100
+        driver-class-name: com.mysql.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        filters: stat
+        maxActive: 1000
+        initialSize: 100
+        maxWait: 60000
+        minIdle: 500
+        # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+        timeBetweenEvictionRunsMillis: 60000
+        # 配置一个连接在池中最小生存的时间，单位是毫秒
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxOpenPreparedStatements: 20
+# mybatis
+mybatis:
+    type-aliases-package: com.anthonyzero.seckill.domain
+    configuration:
+        map-underscore-to-camel-case: true
+        default-fetch-size: 100
+        default-statement-timeout: 3000
+    mapper-locations: classpath:com/anthonyzero/seckill/dao/*.xml
+# redis
+redis:
+    host: 127.0.0.1
+    port: 6379
+    timeout: 10
+    poolMaxTotal: 1000
+    poolMaxIdle: 500
+    poolMaxWait: 500
