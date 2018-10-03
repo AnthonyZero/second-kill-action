@@ -34,6 +34,14 @@ public class RedisService {
         }
     }
 
+    /**
+     * 设置对象
+     * @param prefix
+     * @param key
+     * @param data
+     * @param <T>
+     * @return
+     */
     public <T> boolean set(KeyPrefix prefix, String key, T data) {
         Jedis jedis = null;
         try {
@@ -51,6 +59,57 @@ public class RedisService {
                 jedis.setex(realKey, seconds, str);
             }
             return true;
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /***
+     * 判断key是否存在
+     * @param prefix
+     * @param key
+     * @return
+     */
+    public boolean exists(KeyPrefix prefix, String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            String realKey = prefix.getPrefix() + key;
+            return jedis.exists(realKey);
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 自增
+     * @param prefix
+     * @param key
+     * @return
+     */
+    public Long incr(KeyPrefix prefix, String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            String realKey = prefix.getPrefix() + key;
+            return jedis.incr(realKey);
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 自减
+     * @param prefix
+     * @param key
+     * @return
+     */
+    public Long decr(KeyPrefix prefix, String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            String realKey = prefix.getPrefix() + key;
+            return jedis.decr(realKey);
         } finally {
             returnToPool(jedis);
         }
