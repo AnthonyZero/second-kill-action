@@ -37,4 +37,12 @@ public enum CodeMsgEnum {
         this.code = code;
         this.msg = msg;
     }
+
+    public CodeMsgEnum fillArgs(Object... objects) {
+        int code = this.code;
+        //格式化错误信息 填充后面字符串（参数校验异常：%s!）
+        String message = String.format(this.msg, objects);
+        this.msg = message;
+        return this;
+    }
 }
