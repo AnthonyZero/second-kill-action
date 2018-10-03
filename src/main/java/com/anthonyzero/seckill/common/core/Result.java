@@ -8,13 +8,17 @@ import lombok.*;
  * 统一接口响应
  */
 @Getter
-@NoArgsConstructor
 public class Result<T> {
     private static final int DEFAULT_SUCCESS_CODE = 0;
     private static final String DEFAULT_SUCCESS_MESSAGE = "success";
     private int code;
     private String msg;
     private T data;
+
+    private Result() {
+        this.code = DEFAULT_SUCCESS_CODE;
+        this.msg = DEFAULT_SUCCESS_MESSAGE;
+    }
 
     private Result(T data) {
         this.code = DEFAULT_SUCCESS_CODE;
@@ -33,6 +37,15 @@ public class Result<T> {
     @Override
     public String toString() {
         return JSON.toJSONString(this);
+    }
+
+    /**
+     * 默认成功的时候调用
+     * @param <T>
+     * @return
+     */
+    public static <T> Result<T> success() {
+        return new Result<T>();
     }
 
     /**
