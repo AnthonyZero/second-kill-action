@@ -32,7 +32,7 @@ public class LoginController {
     @PostMapping("/do_login")
     @ResponseBody
     public Result<String> doLogin(HttpServletResponse response, @Valid LoginVO loginVO){
-        seckillUserService.login(response, loginVO);
-        return Result.success();
+        String token = seckillUserService.login(response, loginVO);
+        return Result.success(token);
     }
 }

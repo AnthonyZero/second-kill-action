@@ -59,8 +59,12 @@ public class SeckillController {
             model.addAttribute("errmsg", CodeMsgEnum.REPEATE_SECKILL.getMsg());
             return "seckill_fail";
         }
-        // 减库存，下订单
+        // 减库存失败 因此创建订单返回null
         OrderInfo orderInfo = seckillService.seckill(seckillUser, goodsVO);
+        if (orderInfo == null) {
+            model.addAttribute("errmsg", CodeMsgEnum.SECKILL_OVER.getMsg());
+            return "seckill_fail";
+        }
         model.addAttribute("goods", goodsVO);
         model.addAttribute("orderInfo", orderInfo);
         return "order_detail";

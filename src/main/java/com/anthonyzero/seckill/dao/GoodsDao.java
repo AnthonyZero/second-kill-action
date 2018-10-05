@@ -32,6 +32,6 @@ public interface GoodsDao {
      * @param seckillGoods
      * @return
      */
-    @Update("update seckill_goods set stock_count=stock_count-1 where goods_id=#{goodsId} and stock_count > 0")
+    @Update("update seckill_goods set stock_count=stock_count-1 where goods_id=#{goodsId}")
     int reduceStock(SeckillGoods seckillGoods);
 }
