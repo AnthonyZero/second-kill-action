@@ -20,6 +20,7 @@ public enum CodeMsgEnum {
     PASSWORD_ERROR(500215, "密码错误！"),
 
     // 商品模块 5003XX
+    GOODS_NOT_EXIST(500300, "商品不存在"),
 
     // 订单模块 5004XX
     ORDER_NOT_EXIST(500400, "订单不存在！"),
