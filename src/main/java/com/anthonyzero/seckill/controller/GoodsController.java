@@ -50,7 +50,7 @@ public class GoodsController {
     @GetMapping("/to_detail")
     public String goodsDetail(Model model, SeckillUser user, long goodsId) {
         GoodsVO goodsVO = goodsService.getGoodsVOByGoodsId(goodsId);
-        System.out.println("进入");
+
         long startAt = goodsVO.getStartTime().getTime(); //秒杀开始时间
         long endAt = goodsVO.getEndTime().getTime(); //秒杀结束时间
 
