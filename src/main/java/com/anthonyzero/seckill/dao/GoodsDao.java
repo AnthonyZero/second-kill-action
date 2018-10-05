@@ -2,6 +2,7 @@ package com.anthonyzero.seckill.dao;
 
 import com.anthonyzero.seckill.vo.GoodsVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -15,4 +16,12 @@ public interface GoodsDao {
      */
     @Select("select g.*, sg.seckill_price, sg.stock_count, sg.start_time, sg.end_time from seckill_goods sg left join goods g on sg.goods_id=g.id")
     List<GoodsVO> listGoodsVO();
+
+    /**
+     * 获取商品信息
+     * @param goodsId
+     * @return
+     */
+    @Select("select g.*, sg.seckill_price, sg.stock_count, sg.start_time, sg.end_time from seckill_goods sg left join goods g on sg.goods_id=g.id where g.id=#{goodsId}")
+    GoodsVO getGoodsVOByGoodsId(@Param("goodsId") long goodsId);
 }

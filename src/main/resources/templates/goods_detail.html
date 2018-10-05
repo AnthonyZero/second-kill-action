@@ -23,45 +23,45 @@
 <div class="panel panel-default">
   <div class="panel-heading">秒杀商品详情</div>
   <div class="panel-body">
-  	<span th:if="${user eq null}"> 您还没有登录，请登陆后再操作<br/></span>
+  	<span th:if="${goods.seckillUser eq null}"> 您还没有登录，请登陆后再操作<br/></span>
   	<span>没有收货地址的提示。。。</span>
   </div>
   <table class="table" id="goodslist">
   	<tr>  
         <td>商品名称</td>  
-        <td colspan="3" th:text="${goods.goodsName}"></td> 
+        <td colspan="3" th:text="${goods.goods.goodsName}"></td>
      </tr>  
      <tr>  
         <td>商品图片</td>  
-        <td colspan="3"><img th:src="@{${goods.goodsImg}}" width="200" height="200" /></td>  
+        <td colspan="3"><img th:src="@{${goods.goods.goodsImg}}" width="200" height="200" /></td>
      </tr>
      <tr>  
         <td>秒杀开始时间</td>  
-        <td th:text="${#dates.format(goods.startTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="${#dates.format(goods.goods.startTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
         <td id="miaoshaTip">	
-        	<input type="hidden" id="remainSeconds" th:value="${remainSeconds}" />
-        	<span th:if="${seckillStatus eq 0}">秒杀倒计时：<span id="countDown" th:text="${remainSeconds}"></span>秒</span>
-        	<span th:if="${seckillStatus eq 1}">秒杀进行中</span>
-        	<span th:if="${seckillStatus eq 2}">秒杀已结束</span>
+        	<input type="hidden" id="remainSeconds" th:value="${goods.remainSeconds}" />
+        	<span th:if="${goods.seckillStatus eq 0}">秒杀倒计时：<span id="countDown" th:text="${goods.remainSeconds}"></span>秒</span>
+        	<span th:if="${goods.seckillStatus eq 1}">秒杀进行中</span>
+        	<span th:if="${goods.seckillStatus eq 2}">秒杀已结束</span>
         </td>
         <td>
         	<form id="miaoshaForm" method="post" action="/seckill/do_seckill">
         		<button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
-        		<input type="hidden" name="goodsId" th:value="${goods.id}" />
+        		<input type="hidden" name="goodsId" th:value="${goods.goods.id}" />
         	</form>
         </td>
      </tr>
      <tr>  
         <td>商品原价</td>  
-        <td colspan="3" th:text="${goods.goodsPrice}"></td>  
+        <td colspan="3" th:text="${goods.goods.goodsPrice}"></td>
      </tr>
       <tr>  
         <td>秒杀价</td>  
-        <td colspan="3" th:text="${goods.seckillPrice}"></td>
+        <td colspan="3" th:text="${goods.goods.seckillPrice}"></td>
      </tr>
      <tr>  
         <td>库存数量</td>  
-        <td colspan="3" th:text="${goods.stockCount}"></td>  
+        <td colspan="3" th:text="${goods.goods.stockCount}"></td>
      </tr>
   </table>
 </div>
