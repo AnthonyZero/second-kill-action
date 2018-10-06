@@ -74,13 +74,20 @@ public class GoodsController {
     }
 
     /**
-     *
+     * 商品详情页 （页面缓存）
      * @param goodsId
      * @param user
      * @return
      */
-    @GetMapping("/to_detail")
-    public String goodsDetail(Model model, SeckillUser user, long goodsId) {
+    @ResponseBody
+    @GetMapping(value = "/to_detail", produces = "text/html")
+    public String goodsDetail(HttpServletRequest request, HttpServletResponse response, Model model, SeckillUser user, long goodsId) {
+        // 取缓存
+        String html = redisService.get(GoodsKey.getGoodsDetail, "" + goodsId, String.class);
+        if (!StringUtils.isEmpty(html)) {
+            return html;
+        }
+
         GoodsVO goodsVO = goodsService.getGoodsVOByGoodsId(goodsId);
 
         long startAt = goodsVO.getStartTime().getTime(); //秒杀开始时间
@@ -95,7 +102,17 @@ public class GoodsController {
         goodsDetailVO.setSeckillStatus(map.get("seckillStatus"));
 
         model.addAttribute("goods", goodsDetailVO);
-        return "goods_detail";
+
+        SpringWebContext ctx = new SpringWebContext(request, response, request.getServletContext(), request.getLocale(),
+                model.asMap(), applicationContext);
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", ctx);
+
+        if (!StringUtils.isEmpty(html)) {
+            redisService.set(GoodsKey.getGoodsDetail, "" + goodsId, html);
+        }
+
+        return html;
+//        return "goods_detail";
     }
 
     private Map<String, Integer> checkTime(long startAt, long endAt) {
