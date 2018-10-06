@@ -1,17 +1,26 @@
 package com.anthonyzero.seckill.controller;
 
 import com.anthonyzero.seckill.common.core.Result;
+import com.anthonyzero.seckill.common.redis.RedisService;
+import com.anthonyzero.seckill.common.redis.key.GoodsKey;
 import com.anthonyzero.seckill.domain.SeckillUser;
 import com.anthonyzero.seckill.service.GoodsService;
 import com.anthonyzero.seckill.vo.GoodsDetailVO;
 import com.anthonyzero.seckill.vo.GoodsVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.spring4.context.SpringWebContext;
+import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,19 +35,42 @@ public class GoodsController {
     @Autowired
     private GoodsService goodsService;
 
+    @Autowired
+    private ThymeleafViewResolver thymeleafViewResolver;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    private RedisService redisService;
+
     /**
-     * 商品列表
+     * 商品列表 （页面缓存）
      * @param model
      * @param seckillUser
      * @return
      */
-    @GetMapping("/list")
-    public String goodsList(Model model, SeckillUser seckillUser) {
+    @ResponseBody
+    @GetMapping(value = "/list", produces = "text/html")
+    public String goodsList(HttpServletRequest request, HttpServletResponse response, Model model, SeckillUser seckillUser) {
         model.addAttribute("user", seckillUser);
 
         List<GoodsVO> list = goodsService.listGoodsVO();
         model.addAttribute("goodsList", list);
-        return "goods_list";
+//        return "goods_list";
+        //取缓存
+        String html = redisService.get(GoodsKey.getGoodsList, "", String.class); //默认60秒过期
+        if (StringUtils.isNotEmpty(html)) {
+            return html;
+        }
+        SpringWebContext springWebContext = new SpringWebContext(request, response, request.getServletContext(),
+                request.getLocale(), model.asMap(), applicationContext);
+        //手动渲染goods_list 商品列表页面
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_list", springWebContext);
+        if (StringUtils.isNotEmpty(html)) {
+            redisService.set(GoodsKey.getGoodsList, "", html);
+        }
+        return html;
     }
 
     /**
