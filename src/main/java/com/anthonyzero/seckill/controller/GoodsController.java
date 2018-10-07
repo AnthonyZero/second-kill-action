@@ -53,16 +53,18 @@ public class GoodsController {
     @ResponseBody
     @GetMapping(value = "/list", produces = "text/html")
     public String goodsList(HttpServletRequest request, HttpServletResponse response, Model model, SeckillUser seckillUser) {
-        model.addAttribute("user", seckillUser);
-
-        List<GoodsVO> list = goodsService.listGoodsVO();
-        model.addAttribute("goodsList", list);
-//        return "goods_list";
         //取缓存
         String html = redisService.get(GoodsKey.getGoodsList, "", String.class); //默认60秒过期
         if (StringUtils.isNotEmpty(html)) {
             return html;
         }
+
+        model.addAttribute("user", seckillUser);
+
+        List<GoodsVO> list = goodsService.listGoodsVO();
+        model.addAttribute("goodsList", list);
+//        return "goods_list";
+
         SpringWebContext springWebContext = new SpringWebContext(request, response, request.getServletContext(),
                 request.getLocale(), model.asMap(), applicationContext);
         //手动渲染goods_list 商品列表页面
@@ -71,6 +73,32 @@ public class GoodsController {
             redisService.set(GoodsKey.getGoodsList, "", html);
         }
         return html;
+    }
+
+    /**
+     * 获取商品详情 （页面静态化 ajax请求）
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @GetMapping(value = "/detail/{goodsId}")
+    @ResponseBody
+    public Result<GoodsDetailVO> detail(SeckillUser user, @PathVariable("goodsId") long goodsId) {
+
+        GoodsVO goodsVO = goodsService.getGoodsVOByGoodsId(goodsId);
+
+        long startAt = goodsVO.getStartTime().getTime();
+        long endAt = goodsVO.getEndTime().getTime();
+
+        Map<String, Integer> map = checkTime(startAt, endAt);
+
+        GoodsDetailVO goodsDetailVO = new GoodsDetailVO();
+        goodsDetailVO.setGoods(goodsVO);
+        goodsDetailVO.setSeckillUser(user);
+        goodsDetailVO.setRemainSeconds(map.get("remainSeconds"));
+        goodsDetailVO.setSeckillStatus(map.get("seckillStatus"));
+
+        return Result.success(goodsDetailVO);
     }
 
     /**
