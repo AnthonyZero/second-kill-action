@@ -32,7 +32,16 @@ public class OrderService {
      */
     public SeckillOrder getSeckillOrderByUserIdGoodsId(Long userId, long goodsId) {
 //        return orderDao.getSeckillOrderByUserIdGoodsId(userId, goodsId);
-        return redisService.get(OrderKey.getSeckillOrderByUidGid, "" + userId + "_" + goodsId, SeckillOrder.class);
+        SeckillOrder seckillOrder = redisService.get(OrderKey.getSeckillOrderByUidGid, "" + userId + "_" + goodsId, SeckillOrder.class);
+        if (seckillOrder != null) {
+            return seckillOrder;
+        }
+
+        seckillOrder = orderDao.getSeckillOrderByUserIdGoodsId(userId, goodsId);
+        if (seckillOrder != null) {
+            redisService.set(OrderKey.getSeckillOrderByUidGid, "" + userId + "_" + goodsId, seckillOrder);
+        }
+        return seckillOrder;
     }
 
     /**
@@ -61,10 +70,6 @@ public class OrderService {
         seckillOrder.setUserId(seckillUser.getId());
         seckillOrder.setGoodsId(goods.getId());
         orderDao.insertSeckillOrder(seckillOrder);
-
-        // 秒杀订单 加入缓存
-        redisService.set(OrderKey.getSeckillOrderByUidGid, "" + seckillUser.getId() + "_" + goods.getId(),
-                seckillOrder);
 
         return orderInfo;
     }

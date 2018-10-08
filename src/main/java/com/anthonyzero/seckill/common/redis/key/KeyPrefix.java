@@ -5,7 +5,7 @@ package com.anthonyzero.seckill.common.redis.key;
  */
 public interface KeyPrefix {
     /**
-     * 过期时间
+     * 过期时间 秒为单位
      * @return
      */
     public int expireSeconds();
