@@ -6,5 +6,5 @@ public class OrderKey extends AbstractPrefix {
         super(prefix);
     }
 
-    public static OrderKey seckillOrder = new OrderKey("order");
+    public static OrderKey getSeckillOrderByUidGid = new OrderKey("soug");
 }

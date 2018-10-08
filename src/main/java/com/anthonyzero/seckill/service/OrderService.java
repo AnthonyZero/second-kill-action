@@ -2,6 +2,8 @@ package com.anthonyzero.seckill.service;
 
 import com.anthonyzero.seckill.common.enums.OrderChannelEnum;
 import com.anthonyzero.seckill.common.enums.OrderStatusEnum;
+import com.anthonyzero.seckill.common.redis.RedisService;
+import com.anthonyzero.seckill.common.redis.key.OrderKey;
 import com.anthonyzero.seckill.dao.OrderDao;
 import com.anthonyzero.seckill.domain.OrderInfo;
 import com.anthonyzero.seckill.domain.SeckillOrder;
@@ -19,6 +21,9 @@ public class OrderService {
     @Autowired
     private OrderDao orderDao;
 
+    @Autowired
+    private RedisService redisService;
+
     /**
      * 获取秒杀订单
      * @param userId
@@ -26,7 +31,8 @@ public class OrderService {
      * @return
      */
     public SeckillOrder getSeckillOrderByUserIdGoodsId(Long userId, long goodsId) {
-        return orderDao.getSeckillOrderByUserIdGoodsId(userId, goodsId);
+//        return orderDao.getSeckillOrderByUserIdGoodsId(userId, goodsId);
+        return redisService.get(OrderKey.getSeckillOrderByUidGid, "" + userId + "_" + goodsId, SeckillOrder.class);
     }
 
     /**
@@ -49,11 +55,16 @@ public class OrderService {
         orderInfo.setUserId(seckillUser.getId());
         orderDao.insert(orderInfo);
 
+        // 用户ID + 商品ID 建立唯一unique索引 防止用户重复秒杀
         SeckillOrder seckillOrder = new SeckillOrder();
         seckillOrder.setOrderId(orderInfo.getId());
         seckillOrder.setUserId(seckillUser.getId());
         seckillOrder.setGoodsId(goods.getId());
         orderDao.insertSeckillOrder(seckillOrder);
+
+        // 秒杀订单 加入缓存
+        redisService.set(OrderKey.getSeckillOrderByUidGid, "" + seckillUser.getId() + "_" + goods.getId(),
+                seckillOrder);
 
         return orderInfo;
     }
