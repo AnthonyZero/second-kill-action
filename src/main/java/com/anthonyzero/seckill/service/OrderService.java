@@ -57,4 +57,13 @@ public class OrderService {
 
         return orderInfo;
     }
+
+    /**
+     * 通过订单ID获取订单信息
+     * @param orderId
+     * @return
+     */
+    public OrderInfo getOrderById(long orderId) {
+        return orderDao.getOrderById(orderId);
+    }
 }
