@@ -1,5 +1,6 @@
 package com.anthonyzero.seckill.controller;
 
+import com.anthonyzero.seckill.common.core.Result;
 import com.anthonyzero.seckill.common.enums.CodeMsgEnum;
 import com.anthonyzero.seckill.domain.OrderInfo;
 import com.anthonyzero.seckill.domain.SeckillOrder;
@@ -8,13 +9,12 @@ import com.anthonyzero.seckill.service.GoodsService;
 import com.anthonyzero.seckill.service.OrderService;
 import com.anthonyzero.seckill.service.SeckillService;
 import com.anthonyzero.seckill.vo.GoodsVO;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 秒杀
@@ -68,5 +68,40 @@ public class SeckillController {
         model.addAttribute("goods", goodsVO);
         model.addAttribute("orderInfo", orderInfo);
         return "order_detail";
+    }
+
+
+    /**
+     * 秒杀ajax请求
+     * @param seckillUser
+     * @param goodsId
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/seckill")
+    public Result<OrderInfo> doSeckill(SeckillUser seckillUser, long goodsId) {
+        if (seckillUser == null) {
+            return Result.error(CodeMsgEnum.SESSION_ERROR);
+        }
+
+        //判断库存
+        GoodsVO goodsVO = goodsService.getGoodsVOByGoodsId(goodsId);
+        if (goodsVO == null) {
+            return Result.error(CodeMsgEnum.GOODS_NOT_EXIST);
+        }
+        if (goodsVO.getStockCount() <= 0) {
+            return Result.error(CodeMsgEnum.SECKILL_OVER);
+        }
+        //重复秒杀判断
+        SeckillOrder seckillOrder = orderService.getSeckillOrderByUserIdGoodsId(seckillUser.getId(), goodsId);
+        if (seckillOrder != null) {
+            return Result.error(CodeMsgEnum.REPEATE_SECKILL);
+        }
+        // 减库存失败 因此创建订单返回null
+        OrderInfo orderInfo = seckillService.seckill(seckillUser, goodsVO);
+        if (orderInfo == null) {
+            return Result.error(CodeMsgEnum.SECKILL_OVER);
+        }
+        return Result.success(orderInfo);
     }
 }
