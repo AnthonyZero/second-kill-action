@@ -31,6 +31,16 @@ spring:
         testOnReturn: false
         poolPreparedStatements: true
         maxOpenPreparedStatements: 20
+    # static
+    resources:
+        add-mappings: true
+        cache-period: 3600
+        chain:
+            cache: true
+            enabled: true
+            gzipped: true
+            html-application-cache: true
+        static-locations: classpath:/static/
 # mybatis
 mybatis:
     type-aliases-package: com.anthonyzero.seckill.domain
