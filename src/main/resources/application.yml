@@ -41,6 +41,27 @@ spring:
             gzipped: true
             html-application-cache: true
         static-locations: classpath:/static/
+    # rabbitmq
+    rabbitmq:
+        host: 127.0.0.1
+        port: 5672
+        username: guest
+        password: guest
+        virtual-host: /
+        listener:
+            simple:
+                concurrency: 10
+                max-concurrency: 10
+                prefetch: 1
+                auto-startup: true
+                default-requeue-rejected: true
+        template:
+            retry:
+                enabled: true
+                initial-interval: 1000
+                max-attempts: 3
+                max-interval: 10000
+                multiplier: 1.0
 # mybatis
 mybatis:
     type-aliases-package: com.anthonyzero.seckill.domain
