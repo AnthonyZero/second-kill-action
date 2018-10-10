@@ -95,7 +95,8 @@
             },
             success: function (data) {
                 if (data.code == 0) {
-                    window.location.href = "/order_detail.htm?orderId=" + data.data.id;
+                    // window.location.href = "/order_detail.htm?orderId=" + data.data.id;
+                    getSeckillResult($("#goodsId").val());
                 } else {
                     layer.msg(data.msg);
                 }
@@ -126,6 +127,7 @@
         });*/
     }
 
+    // 轮询获取秒杀结果
     function getSeckillResult(goodsId) {
         g_showLoading();
         $.ajax({
