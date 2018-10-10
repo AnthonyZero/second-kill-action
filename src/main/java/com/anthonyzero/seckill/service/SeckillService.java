@@ -2,10 +2,13 @@ package com.anthonyzero.seckill.service;
 
 import com.anthonyzero.seckill.common.redis.RedisService;
 import com.anthonyzero.seckill.common.redis.key.SeckillKey;
+import com.anthonyzero.seckill.common.utils.Md5Util;
 import com.anthonyzero.seckill.domain.OrderInfo;
 import com.anthonyzero.seckill.domain.SeckillOrder;
 import com.anthonyzero.seckill.domain.SeckillUser;
 import com.anthonyzero.seckill.vo.GoodsVO;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,7 @@ import javax.script.ScriptEngineManager;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class SeckillService {
@@ -140,6 +144,54 @@ public class SeckillService {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    /**
+     * 验证验证码是否正确
+     * @param user
+     * @param goodsId
+     * @param verifyCode
+     * @return
+     */
+    public boolean checkVerifyCode(SeckillUser user, long goodsId, int verifyCode) {
+        if (user == null || goodsId <= 0) {
+            return false;
+        }
+        Integer oldCode = redisService.get(SeckillKey.getSeckillVerifyCode, user.getId() + "," + goodsId,
+                Integer.class);
+        if (oldCode == null || oldCode - verifyCode != 0) {
+            return false;
+        }
+        redisService.delete(SeckillKey.getSeckillVerifyCode, user.getId() + "," + goodsId);
+        return true;
+    }
+
+    /**
+     * 检测地址（秒杀字符串）是否正确
+     * @param seckillUser
+     * @param goodsId
+     * @param path
+     * @return
+     */
+    public boolean checkPath(SeckillUser seckillUser, long goodsId, String path) {
+        if (seckillUser == null || StringUtils.isEmpty(path) || goodsId <= 0) {
+            return false;
+        }
+        String oldPath = redisService.get(SeckillKey.getSeckillPath, "" + seckillUser.getId() + "_" + goodsId,
+                String.class);
+        return path.equals(oldPath);
+    }
+
+    /**
+     * 生成秒杀地址
+     * @param seckillUser
+     * @param goodsId
+     * @return
+     */
+    public String createSeckillPath(SeckillUser seckillUser, long goodsId) {
+        String path = DigestUtils.md5Hex(UUID.randomUUID().toString().replaceAll("-", ""));
+        redisService.set(SeckillKey.getSeckillPath, "" + seckillUser.getId() + "_" + goodsId, path);
+        return path;
     }
 
 }

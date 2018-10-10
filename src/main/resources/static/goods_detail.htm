@@ -89,25 +89,6 @@
         var goodsId = $("#goodsId").val();
         g_showLoading();
         $.ajax({
-            url: "/seckill/seckill",
-            type: "POST",
-            data: {
-                goodsId: goodsId
-            },
-            success: function (data) {
-                if (data.code == 0) {
-                    // window.location.href = "/order_detail.htm?orderId=" + data.data.id;
-                    getSeckillResult($("#goodsId").val());
-                } else {
-                    layer.msg(data.msg);
-                }
-            },
-            error: function () {
-                layer.msg("客户端请求有误");
-            }
-        })
-        /*g_showLoading();
-        $.ajax({
             url: "/seckill/path",
             type: "GET",
             data: {
@@ -125,7 +106,7 @@
             error: function () {
                 layer.msg("客户端请求有误");
             }
-        });*/
+        });
     }
 
     // 轮询获取秒杀结果
@@ -165,6 +146,7 @@
         });
     }
 
+    // 真正请求秒杀接口
     function doSeckill(path) {
         $.ajax({
             url: "/seckill/" + path + "/seckill",

@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -114,9 +115,58 @@ public class SeckillController implements InitializingBean {
      */
     @ResponseBody
     @PostMapping("/seckill")
-    public Result<OrderInfo> doSeckill(SeckillUser seckillUser, long goodsId) {
+    public Result doSeckill(SeckillUser seckillUser, long goodsId) {
         if (seckillUser == null) {
             return Result.error(CodeMsgEnum.SESSION_ERROR);
+        }
+
+        // 内存标记，减少redis访问
+        boolean over = localOverMap.get(goodsId);
+        if (over) {
+            return Result.error(CodeMsgEnum.SECKILL_OVER);
+        }
+
+        // redis预减库存  这里针对已经秒杀过的人再来秒杀 会导致缓存中的库存和数据库中的库存不一致（商品有剩余） TODO...
+        long stock = redisService.decr(GoodsKey.getSeckillGoodsStock, "" + goodsId);
+        if (stock < 0) {
+            localOverMap.put(goodsId, true);
+            return Result.error(CodeMsgEnum.SECKILL_OVER);
+        }
+
+        //重复秒杀判断
+        SeckillOrder seckillOrder = orderService.getSeckillOrderByUserIdGoodsId(seckillUser.getId(), goodsId);
+        if (seckillOrder != null) {
+            return Result.error(CodeMsgEnum.REPEATE_SECKILL);
+        }
+        // 异步下单
+        SeckillMessage seckillMessage = new SeckillMessage();
+        seckillMessage.setGoodsId(goodsId);
+        seckillMessage.setSeckillUser(seckillUser);
+        mqSender.sendSeckillMessage(seckillMessage);
+
+        // 排队中
+        return Result.success();
+    }
+
+
+    /**
+     * 秒杀地址
+     * @param seckillUser
+     * @param goodsId
+     * @param path
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/{path}/seckill")
+    public Result doPathSeckill(SeckillUser seckillUser, long goodsId, @PathVariable("path") String path) {
+        if (seckillUser == null) {
+            return Result.error(CodeMsgEnum.SESSION_ERROR);
+        }
+
+        // 验证path
+        boolean check = seckillService.checkPath(seckillUser, goodsId, path);
+        if (!check) {
+            return Result.error(CodeMsgEnum.REQUEST_ILLEGAL);
         }
 
         // 内存标记，减少redis访问
@@ -182,6 +232,28 @@ public class SeckillController implements InitializingBean {
             e.printStackTrace();
             return Result.error(CodeMsgEnum.SECKILL_FAIL);
         }
+    }
+
+    /**
+     * 获取秒杀随机字符串 用于秒杀地址随机变化
+     * @param request
+     * @param seckillUser
+     * @param goodsId
+     * @param verifyCode
+     * @return
+     */
+    @GetMapping("/path")
+    @ResponseBody
+    public Result<String> getSeckillPath(HttpServletRequest request, SeckillUser seckillUser,
+                                         @RequestParam("goodsId") long goodsId,
+                                         @RequestParam(value = "verifyCode", defaultValue = "0") int verifyCode) {
+
+        boolean check = seckillService.checkVerifyCode(seckillUser, goodsId, verifyCode);
+        if (!check) {
+            return Result.error(CodeMsgEnum.VERIFYCODE_ERROR);
+        }
+        String path = seckillService.createSeckillPath(seckillUser, goodsId);
+        return Result.success(path);
     }
 
 
