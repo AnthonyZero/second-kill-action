@@ -10,6 +10,7 @@ public enum CodeMsgEnum {
     BIND_ERROR(500101, "参数校验异常：%s!"),
     REQUEST_ILLEGAL(500102, "请求非法！"),
     ACCESS_LIMIT_REACHED(500103, "访问太频繁！"),
+    VERIFYCODE_ERROR(500104, "验证码错误或已失效"),
 
     //登录模块 5002XX
     SESSION_ERROR(500210, "Session不存在或者已经失效！"),

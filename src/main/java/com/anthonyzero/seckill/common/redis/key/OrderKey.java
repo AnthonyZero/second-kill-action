@@ -6,5 +6,5 @@ public class OrderKey extends AbstractPrefix {
         super(expireSeconds, prefix);
     }
 
-    public static OrderKey getSeckillOrderByUidGid = new OrderKey(60*60,"soug");
+    public static OrderKey getSeckillOrderByUidGid = new OrderKey(60,"soug");
 }
