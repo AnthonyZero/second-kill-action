@@ -19,11 +19,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,6 +158,30 @@ public class SeckillController implements InitializingBean {
     public Result<Long> getSeckillResult(SeckillUser seckillUser, long goodsId) {
         long result = seckillService.getSeckillResult(seckillUser.getId(), goodsId);
         return Result.success(result);
+    }
+
+    /**
+     * 获取验证码图片 数学公式
+     * @param response
+     * @param seckillUser
+     * @param goodsId
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/verifyCode")
+    public Result<String> getVerifyCode(HttpServletResponse response, SeckillUser seckillUser, long goodsId) {
+        response.setContentType("application/json;charset=UTF-8");
+        BufferedImage image = seckillService.createVerifyCode(seckillUser, goodsId);
+        try {
+            OutputStream outputStream = response.getOutputStream();
+            ImageIO.write(image, "JPEG", outputStream);
+            outputStream.flush();
+            outputStream.close();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(CodeMsgEnum.SECKILL_FAIL);
+        }
     }
 
 

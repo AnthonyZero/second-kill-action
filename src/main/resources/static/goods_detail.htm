@@ -87,6 +87,7 @@
 <script>
     function getSeckillPath() {
         var goodsId = $("#goodsId").val();
+        g_showLoading();
         $.ajax({
             url: "/seckill/seckill",
             type: "POST",
@@ -249,7 +250,7 @@
             $("#miaoshaTip").html("秒杀进行中");
             $("#verifyCodeImg").attr("src", "/seckill/verifyCode?goodsId=" + $("#goodsId").val());
             $("#verifyCodeImg").show();
-            $("#verifyCode").show();
+            $("#verifyCode").show(); //填验证码计算结果的输入框
         } else {//秒杀已经结束
             $("#buyButton").attr("disabled", true);
             $("#miaoshaTip").html("秒杀已经结束");
