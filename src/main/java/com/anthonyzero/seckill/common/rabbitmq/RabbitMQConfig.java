@@ -62,7 +62,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * Fanout模式 交换机Exchange
+     * Fanout广播模式 交换机Exchange
      */
     @Bean
     public FanoutExchange fanoutExchange() {
@@ -80,7 +80,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * Header 交换机Exchange
+     * Header 交换机Exchange 通过key-value匹配
      */
     @Bean
     public HeadersExchange headersExchange() {
