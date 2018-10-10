@@ -31,7 +31,7 @@ public class MQReceiver {
 
     @RabbitListener(queues = RabbitMQConfig.SECKILL_QUEUE)
     public void dealSeckillMessage(String message) {
-        log.info("receive message :", message);
+        log.info("receive message :" + message);
         SeckillMessage seckillMessage = JSON.parseObject(message, new TypeReference<SeckillMessage>(){});
         SeckillUser user = seckillMessage.getSeckillUser();
         long goodsId = seckillMessage.getGoodsId();

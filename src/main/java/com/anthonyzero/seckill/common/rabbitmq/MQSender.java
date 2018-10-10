@@ -22,7 +22,7 @@ public class MQSender {
      */
     public void sendSeckillMessage(SeckillMessage seckillMessage) {
         String msg = JSON.toJSONString(seckillMessage);
-        log.info("send message:", msg);
+        log.info("send message:" + msg);
         amqpTemplate.convertAndSend(RabbitMQConfig.SECKILL_QUEUE, msg);
     }
 }
