@@ -63,8 +63,7 @@
 
 ```
 ## 开始&使用 
-将项目导入开发环境中  
-创建数据库seckill 执行项目dbscript目录下的SQL脚本  
-修改application.yml相关配置:数据库、Redis、RabbitMQ  
-启动项目访问http://localhost:8080/login/loin    
-用帐号15800000000密码123456进行登录 开始体验  
+* 将项目导入开发环境中,创建数据库seckill 执行项目dbscript目录下的SQL脚本  
+* 根据自己本机情况修改application.yml相关配置:数据库连接、Redis、RabbitMQ 
+* 启动项目访问http://localhost:8080/login/loin  用帐号15800000000密码123456进行登录 开始体验  
+
