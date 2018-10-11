@@ -1,4 +1,4 @@
-package com.anthonyzero.seckill.common.access;
+package com.anthonyzero.seckill.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
