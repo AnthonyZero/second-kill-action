@@ -19,6 +19,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Autowired
     private AccessInterceptor accessInterceptor;
+
+    @Autowired
+    private NeedLoginInterceptor needLoginInterceptor;
     /**
      * 添加参数解析器
      * @param argumentResolvers
@@ -34,6 +37,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(needLoginInterceptor);
         registry.addInterceptor(accessInterceptor);
     }
 }
