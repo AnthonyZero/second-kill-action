@@ -1,5 +1,6 @@
 package com.anthonyzero.seckill.controller;
 
+import com.anthonyzero.seckill.common.core.CurrentUserContext;
 import com.anthonyzero.seckill.common.core.Result;
 import com.anthonyzero.seckill.common.redis.RedisService;
 import com.anthonyzero.seckill.common.redis.key.GoodsKey;
@@ -47,19 +48,18 @@ public class GoodsController {
     /**
      * 商品列表 （页面缓存）
      * @param model
-     * @param seckillUser
      * @return
      */
     @ResponseBody
     @GetMapping(value = "/list", produces = "text/html")
-    public String goodsList(HttpServletRequest request, HttpServletResponse response, Model model, SeckillUser seckillUser) {
+    public String goodsList(HttpServletRequest request, HttpServletResponse response, Model model) {
         //取缓存
         String html = redisService.get(GoodsKey.getGoodsList, "", String.class); //默认60秒过期
         if (StringUtils.isNotEmpty(html)) {
             return html;
         }
 
-        model.addAttribute("user", seckillUser);
+        model.addAttribute("user", CurrentUserContext.getUser());
 
         List<GoodsVO> list = goodsService.listGoodsVO();
         model.addAttribute("goodsList", list);
@@ -77,13 +77,12 @@ public class GoodsController {
 
     /**
      * 获取商品详情 （页面静态化 ajax请求）
-     * @param user
      * @param goodsId
      * @return
      */
     @GetMapping(value = "/detail/{goodsId}")
     @ResponseBody
-    public Result<GoodsDetailVO> detail(SeckillUser user, @PathVariable("goodsId") long goodsId) {
+    public Result<GoodsDetailVO> detail(@PathVariable("goodsId") long goodsId) {
 
         GoodsVO goodsVO = goodsService.getGoodsVOByGoodsId(goodsId);
 
@@ -94,7 +93,7 @@ public class GoodsController {
 
         GoodsDetailVO goodsDetailVO = new GoodsDetailVO();
         goodsDetailVO.setGoods(goodsVO);
-        goodsDetailVO.setSeckillUser(user);
+        goodsDetailVO.setSeckillUser(CurrentUserContext.getUser());
         goodsDetailVO.setRemainSeconds(map.get("remainSeconds"));
         goodsDetailVO.setSeckillStatus(map.get("seckillStatus"));
 
