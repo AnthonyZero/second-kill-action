@@ -1,6 +1,7 @@
 package com.anthonyzero.seckill.controller;
 
 import com.anthonyzero.seckill.common.annotation.AccessLimit;
+import com.anthonyzero.seckill.common.core.CurrentUserContext;
 import com.anthonyzero.seckill.common.core.Result;
 import com.anthonyzero.seckill.common.enums.CodeMsgEnum;
 import com.anthonyzero.seckill.common.rabbitmq.MQSender;
@@ -152,7 +153,6 @@ public class SeckillController implements InitializingBean {
 
     /**
      * 秒杀地址
-     * @param seckillUser
      * @param goodsId
      * @param path
      * @return
@@ -160,7 +160,8 @@ public class SeckillController implements InitializingBean {
     @ResponseBody
     @PostMapping("/{path}/seckill")
     @AccessLimit(seconds = 5, maxCount = 5)
-    public Result doPathSeckill(SeckillUser seckillUser, long goodsId, @PathVariable("path") String path) {
+    public Result doPathSeckill(long goodsId, @PathVariable("path") String path) {
+        SeckillUser seckillUser = CurrentUserContext.getUser();
         if (seckillUser == null) {
             return Result.error(CodeMsgEnum.SESSION_ERROR);
         }
@@ -201,29 +202,27 @@ public class SeckillController implements InitializingBean {
 
     /**
      * 获取秒杀结果
-     * @param seckillUser
      * @param goodsId
      * @return  orderId:成功返回订单号 -1:秒杀失败 已经秒杀完了 0:排队中 正在异步下单中
      */
     @ResponseBody
     @GetMapping("/result")
-    public Result<Long> getSeckillResult(SeckillUser seckillUser, long goodsId) {
-        long result = seckillService.getSeckillResult(seckillUser.getId(), goodsId);
+    public Result<Long> getSeckillResult(long goodsId) {
+        long result = seckillService.getSeckillResult(CurrentUserContext.getUser().getId(), goodsId);
         return Result.success(result);
     }
 
     /**
      * 获取验证码图片 数学公式
      * @param response
-     * @param seckillUser
      * @param goodsId
      * @return
      */
     @ResponseBody
     @GetMapping("/verifyCode")
-    public Result<String> getVerifyCode(HttpServletResponse response, SeckillUser seckillUser, long goodsId) {
+    public Result<String> getVerifyCode(HttpServletResponse response, long goodsId) {
         response.setContentType("application/json;charset=UTF-8");
-        BufferedImage image = seckillService.createVerifyCode(seckillUser, goodsId);
+        BufferedImage image = seckillService.createVerifyCode(CurrentUserContext.getUser(), goodsId);
         try {
             OutputStream outputStream = response.getOutputStream();
             ImageIO.write(image, "JPEG", outputStream);
@@ -239,7 +238,6 @@ public class SeckillController implements InitializingBean {
     /**
      * 获取秒杀随机字符串 用于秒杀地址随机变化
      * @param request
-     * @param seckillUser
      * @param goodsId
      * @param verifyCode
      * @return
@@ -247,15 +245,15 @@ public class SeckillController implements InitializingBean {
     @GetMapping("/path")
     @ResponseBody
     @AccessLimit(seconds = 5, maxCount = 2) //5S秒最多点击2次
-    public Result<String> getSeckillPath(HttpServletRequest request, SeckillUser seckillUser,
+    public Result<String> getSeckillPath(HttpServletRequest request,
                                          @RequestParam("goodsId") long goodsId,
                                          @RequestParam(value = "verifyCode", defaultValue = "0") int verifyCode) {
 
-        boolean check = seckillService.checkVerifyCode(seckillUser, goodsId, verifyCode);
+        boolean check = seckillService.checkVerifyCode(CurrentUserContext.getUser(), goodsId, verifyCode);
         if (!check) {
             return Result.error(CodeMsgEnum.VERIFYCODE_ERROR);
         }
-        String path = seckillService.createSeckillPath(seckillUser, goodsId);
+        String path = seckillService.createSeckillPath(CurrentUserContext.getUser(), goodsId);
         return Result.success(path);
     }
 
