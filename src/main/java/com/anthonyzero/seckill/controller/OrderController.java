@@ -1,5 +1,6 @@
 package com.anthonyzero.seckill.controller;
 
+import com.anthonyzero.seckill.common.core.CurrentUserContext;
 import com.anthonyzero.seckill.common.core.Result;
 import com.anthonyzero.seckill.common.enums.CodeMsgEnum;
 import com.anthonyzero.seckill.domain.OrderInfo;
@@ -37,8 +38,8 @@ public class OrderController {
      */
     @ResponseBody
     @GetMapping("/detail")
-    public Result<OrderDetailVO> seckill(SeckillUser seckillUser, @RequestParam("orderId") long orderId) {
-        if (seckillUser == null) {
+    public Result<OrderDetailVO> seckill(@RequestParam("orderId") long orderId) {
+        if (CurrentUserContext.getUser() == null) {
             return Result.error(CodeMsgEnum.SESSION_ERROR);
         }
 
