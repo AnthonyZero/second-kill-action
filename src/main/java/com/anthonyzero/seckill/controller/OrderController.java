@@ -32,7 +32,6 @@ public class OrderController {
 
     /**
      * 订单详情
-     * @param seckillUser
      * @param orderId
      * @return
      */
