@@ -2,8 +2,8 @@
 基于SpringBoot实现的高并发抢购秒杀案例
 
 ## 开发技术
-后端: SpringBoot 1.5.8.RELEASE
-前端: Thymeleaf + Bootstrap + jQuery
+后端: SpringBoot 1.5.8.RELEASE  
+前端: Thymeleaf + Bootstrap + jQuery   
 其它: Redis + RabbitMQ
 
 ## 秒杀优化方向
