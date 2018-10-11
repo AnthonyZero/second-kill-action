@@ -3,8 +3,8 @@
 
 ## 开发技术
 后端: SpringBoot 1.5.8.RELEASE
-前端: Thymeleaf + Bootstrap + jQuery 
-其它: Redis + RabbitMQ 
+前端: Thymeleaf + Bootstrap + jQuery
+其它: Redis + RabbitMQ
 
 ## 秒杀优化方向
 1.将请求尽量拦截在系统上游：传统秒杀系统之所以压力大，是因为请求都落到了数据库，数据读写锁冲突严重，
