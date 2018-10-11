@@ -1,5 +1,6 @@
 package com.anthonyzero.seckill.controller;
 
+import com.anthonyzero.seckill.common.annotation.AccessLimit;
 import com.anthonyzero.seckill.common.core.Result;
 import com.anthonyzero.seckill.common.enums.CodeMsgEnum;
 import com.anthonyzero.seckill.common.rabbitmq.MQSender;
@@ -158,6 +159,7 @@ public class SeckillController implements InitializingBean {
      */
     @ResponseBody
     @PostMapping("/{path}/seckill")
+    @AccessLimit(seconds = 5, maxCount = 5)
     public Result doPathSeckill(SeckillUser seckillUser, long goodsId, @PathVariable("path") String path) {
         if (seckillUser == null) {
             return Result.error(CodeMsgEnum.SESSION_ERROR);
@@ -244,6 +246,7 @@ public class SeckillController implements InitializingBean {
      */
     @GetMapping("/path")
     @ResponseBody
+    @AccessLimit(seconds = 5, maxCount = 2) //5S秒最多点击2次
     public Result<String> getSeckillPath(HttpServletRequest request, SeckillUser seckillUser,
                                          @RequestParam("goodsId") long goodsId,
                                          @RequestParam(value = "verifyCode", defaultValue = "0") int verifyCode) {
