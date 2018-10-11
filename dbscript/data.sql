@@ -1,3 +1,4 @@
 INSERT INTO `goods` VALUES(1,'iPhone X','Apple iPhone X (A1865) 64GB 深空灰色 移动联通电信4G手机','/img/iphonex.png','Apple iPhone X (A1865) 64GB 深空灰色 移动联通电信4G手机','8388.00','8888');
-INSERT INTO `goods` VALUES(2,'MacBook Pro','Apple MacBook Pro 15.4英寸笔记本电脑 银色','/img/macbookpro.png','i7处理器，大容量固态硬盘，外设接口丰富，配备绚丽的retina显示屏，强大而专业！选购AppleCare Protection Plan，获得长达3年来自Apple的额外硬件服务选项。购买勾选：保障服务、原厂保3年。','13599.00','6666');
+INSERT INTO `goods` VALUES(2,'MacBook Pro','Apple MacBook Pro 15.4英寸笔记本电脑 银色','/img/macbookpro.png','i7处理器，大容量固态硬盘，外设接口丰富，配备绚丽的retina显示屏，强大而专业！选购AppleCare Protection Plan，获得长达3年来自Apple的额外硬件服务选项。购买勾选：保障服务、原厂保3年。','13999.00','6666');
 INSERT INTO `seckill_goods` VALUES(1,1,0.01,10,'2018-10-05 15:18:00','2018-10-13 14:00:18'),(2,2,0.01,10,'2018-10-06 14:00:00','2018-10-25 14:00:18');
+INSERT INTO `seckill_user` VALUES ('15800000000', 'AnthonyZero', '9e76998ba52da04ba5c281ba6ae2a23e', 'anthonyzero', null, '2018-10-01 10:12:51', '2018-10-11 10:12:51', '1')
